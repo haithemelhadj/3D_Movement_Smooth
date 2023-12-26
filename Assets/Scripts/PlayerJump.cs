@@ -53,7 +53,7 @@ public class PlayerJump : MonoBehaviour
     //public float playerHeight = 2;
     //public LayerMask whatIsGround;
     //public bool grounded;
-    public bool isUnder;
+    //public bool isUnder;
     public float groundDrag;
     public bool isFalling;
 
@@ -186,13 +186,16 @@ public class PlayerJump : MonoBehaviour
             jumpBufferCooldown -= Time.deltaTime;
         }
     }
+
+    public Vector3 LineDownStart;
+    public Vector3 LineDownEnd;
     void LedgeGrab()
     {
-        if (playerManager.rb.velocity.y < 0 && !playerManager.isHanging)
+        if (playerManager.rb.velocity.y < 0 && !playerManager.isHanging && !playerManager.isUnder)
         {
             RaycastHit downHit;
-            Vector3 LineDownStart = (transform.position + Vector3.up * 1.5f) + transform.forward;
-            Vector3 LineDownEnd = (transform.position + Vector3.up * 0.7f) + transform.forward;
+            LineDownStart = (transform.position + Vector3.up * 1.5f) + transform.forward;
+            LineDownEnd = (transform.position + Vector3.up * 0.7f) + transform.forward;
             Physics.Linecast(LineDownStart, LineDownEnd, out downHit, playerManager.whatIsGround);
             Debug.DrawLine(LineDownStart, LineDownEnd);
             if (downHit.collider != null)

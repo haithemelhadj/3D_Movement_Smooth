@@ -8707,7 +8707,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1102037101}
-  m_LocalRotation: {x: 0.09252102, y: 0.000000017659858, z: -0.0000000016409465, w: 0.99571073}
+  m_LocalRotation: {x: 0.09252102, y: -0.000000017659856, z: 0.0000000016409463, w: 0.99571073}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -19400,7 +19400,6 @@ GameObject:
   - component: {fileID: 1936148293}
   - component: {fileID: 1936148289}
   - component: {fileID: 1936148291}
-  - component: {fileID: 1936148292}
   - component: {fileID: 1936148290}
   m_Layer: 0
   m_Name: Player
@@ -19451,7 +19450,6 @@ MonoBehaviour:
   crouchSpeed: 5
   isSprinting: 0
   isCrouching: 0
-  isUnder: 0
   headObject: {fileID: 2017727698}
   playerState: 0
 --- !u!54 &1936148290
@@ -19500,26 +19498,10 @@ MonoBehaviour:
   offSet: {x: 0, y: 0, z: -1}
   underHead: {fileID: 24550307}
   overHead: {fileID: 1140444977}
-  isUnder: 0
   groundDrag: 5
   isFalling: 0
---- !u!114 &1936148292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936148287}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b792e46284071d478b2863552d099ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isFalling: 0
-  overHead: {fileID: 1140444977}
-  underHead: {fileID: 24550307}
-  rb: {fileID: 1936148290}
-  orientation: {fileID: 1385260994}
+  LineDownStart: {x: 0, y: 0, z: 0}
+  LineDownEnd: {x: 0, y: 0, z: 0}
 --- !u!114 &1936148293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19532,6 +19514,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a118fbfd6f1cb6b46a29d43fdb50c95b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerMovement: {fileID: 1936148289}
+  thirdPersonCam: {fileID: 963194230}
+  playerJump: {fileID: 1936148291}
   rb: {fileID: 1936148290}
   animator: {fileID: 1385260998}
   isHanging: 0
@@ -19539,6 +19524,7 @@ MonoBehaviour:
   sprint: 304
   crouch: 306
   jumpKey: 32
+  isUnder: 0
   extraScanDistance: 0.05
   playerHeight: 2
   whatIsGround:

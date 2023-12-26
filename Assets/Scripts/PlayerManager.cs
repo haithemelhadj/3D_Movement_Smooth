@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    [Header("other scripts")]
+    public PlayerMovement playerMovement;
+    public ThirdPersonCam thirdPersonCam;
+    public PlayerJump playerJump;
+
     [Header("Components")]
     //public PlayerManager playerManager;
     public Rigidbody rb;
@@ -22,7 +27,9 @@ public class PlayerManager : MonoBehaviour
 
 
     [Header("Ground Check")]
-    [Range(0f, 0.2f)] public float extraScanDistance = 0.05f;
+    public bool isUnder;
+    [Range(0f, 1f)] public float extraScanDistance = 0.05f;
+    //[Range(0f, 1f)] public float extraScanDistance = 0.05f;
     public float playerHeight = 2;
     public LayerMask whatIsGround;
 
@@ -30,7 +37,22 @@ public class PlayerManager : MonoBehaviour
 
     private void Update()
     {
+        //head check
+        isUnder = Physics.Raycast(transform.position, Vector3.up, playerHeight * 0.5f + extraScanDistance);
+
         //ground check
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + extraScanDistance, whatIsGround);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        //draw ground check ray
+        Gizmos.DrawRay(transform.position, Vector3.down * (playerHeight * 0.5f + extraScanDistance));
+        // draw head check ray
+        Gizmos.DrawRay(transform.position, Vector3.up * extraScanDistance);
+        //draw edge grab check ray
+        Gizmos.DrawRay(playerJump.LineDownStart, Vector3.Distance(playerJump.LineDownStart, playerJump.LineDownEnd) * Vector3.down);
+
     }
 }

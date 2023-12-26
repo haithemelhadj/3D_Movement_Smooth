@@ -22,8 +22,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isSprinting;
     public bool isCrouching;
 
-    [Header("Crouching")]
-    public bool isUnder;
+    [Header("Crouching")]    
     public Transform headObject;
 
     
@@ -84,9 +83,7 @@ public class PlayerMovement : MonoBehaviour
         AnimationControl();
 
 
-        //head check
-        isUnder = Physics.Raycast(transform.position, Vector3.up, playerManager.playerHeight * 0.5f + playerManager.extraScanDistance);
-
+        
         /*
         if (grounded && Input.GetKeyDown(sprint) && verticalInput > 0 && ) 
         {
@@ -153,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if(Input.GetKeyDown(playerManager.crouch) && playerManager.grounded)
         {
-            if(isCrouching && !isUnder)
+            if(isCrouching && !playerManager.isUnder)
             {
                 material.color = Color.blue;
                 moveSpeed = walkSpeed;
