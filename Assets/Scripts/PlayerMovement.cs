@@ -5,6 +5,12 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     #region Declarations
+    [Header("Components")]
+    public PlayerManager playerManager;
+    public Transform orientation;
+    public CapsuleCollider playerCollider;
+    public Material material;
+
     [Header("Movement")]
     public float moveSpeed;
 
@@ -22,28 +28,19 @@ public class PlayerMovement : MonoBehaviour
 
     
     [Header("Ground Check")]
-    [Range(0f, 0.2f)] public float extraScanDistance = 0.05f;
-    public float playerHeight = 2;
-    public LayerMask whatIsGround;
-    private bool grounded;
+    //[Range(0f, 0.2f)] public float extraScanDistance = 0.05f;
+    //public float playerHeight = 2;
+    //public LayerMask whatIsGround;
+    //private bool grounded;
 
-    [Header("Components")]
-    public Transform orientation;
-    public CapsuleCollider playerCollider;
-    public Material material;
+    
 
     float horizontalInput;
     float verticalInput;
 
     Vector3 moveDirection;
 
-    public Rigidbody rb;
-
-    [Header("Keybinds")]
-    public KeyCode sprint = KeyCode.LeftShift;
-    public KeyCode crouch = KeyCode.LeftControl;
-    //public KeyCode jump = KeyCode.Space;
-
+    //public Rigidbody rb;
 
 
     [Header("Player State")]
@@ -70,27 +67,25 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         //rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+        playerManager.rb.freezeRotation = true;
 
     }
 
     private void Update()
     {
         MyInput();
-        Debug.Log("speed 1 is " + moveSpeed);
+        //Debug.Log("speed 1 is " + moveSpeed);
         Crouching();
-        Debug.Log("speed 2 is " + moveSpeed);
+        //Debug.Log("speed 2 is " + moveSpeed);
         Sprinting();
-        Debug.Log("speed 3 is " + moveSpeed);
+        //Debug.Log("speed 3 is " + moveSpeed);
         speedControl();
-        Debug.Log("speed 4 is " + moveSpeed);
+        //Debug.Log("speed 4 is " + moveSpeed);
+        AnimationControl();
 
 
-
-        //ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + extraScanDistance, whatIsGround);
         //head check
-        isUnder = Physics.Raycast(transform.position, Vector3.up, playerHeight * 0.5f + extraScanDistance);
+        isUnder = Physics.Raycast(transform.position, Vector3.up, playerManager.playerHeight * 0.5f + playerManager.extraScanDistance);
 
         /*
         if (grounded && Input.GetKeyDown(sprint) && verticalInput > 0 && ) 
@@ -125,9 +120,19 @@ public class PlayerMovement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, Vector3.down * (playerHeight * 0.5f + extraScanDistance));//, Color.red
-        Gizmos.DrawRay(headObject.position, Vector3.up * extraScanDistance);//, Color.red
+        Gizmos.DrawRay(transform.position, Vector3.down * (playerManager.playerHeight * 0.5f + playerManager.extraScanDistance));//, Color.red
+        Gizmos.DrawRay(headObject.position, Vector3.up * playerManager.extraScanDistance);//, Color.red
     }
+    #endregion
+
+    #region Animations
+    
+    public void AnimationControl()
+    {
+        playerManager.animator.SetBool("isSprinting", isSprinting);
+        playerManager.animator.SetBool("isCrouching", isCrouching);
+    }
+
     #endregion
 
     #region Input
@@ -135,6 +140,10 @@ public class PlayerMovement : MonoBehaviour
     // get player input
     private void MyInput()
     {
+        if(playerManager.isHanging)
+        {
+            return;
+        }
         //get x,z movement direction
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
@@ -142,7 +151,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Crouching()
     {
-        if(Input.GetKeyDown(crouch) && grounded)
+        if(Input.GetKeyDown(playerManager.crouch) && playerManager.grounded)
         {
             if(isCrouching && !isUnder)
             {
@@ -150,7 +159,7 @@ public class PlayerMovement : MonoBehaviour
                 moveSpeed = walkSpeed;
                 isCrouching = false;
                 //change collider size
-                playerCollider.height = playerHeight;
+                playerCollider.height = playerManager.playerHeight;
                 playerCollider.center = Vector3.zero;
 
             }
@@ -161,16 +170,16 @@ public class PlayerMovement : MonoBehaviour
                 isCrouching = true;
                 isSprinting = false;
                 //change collider size
-                playerCollider.height = playerHeight * 0.5f;
+                playerCollider.height = playerManager.playerHeight * 0.5f;
                 playerCollider.center = new Vector3(0f, -0.5f, 0f);
             }
         }
     }
     private void Sprinting()
     {
-        if (Input.GetKeyDown(sprint))//toggle sprint
+        if (Input.GetKeyDown(playerManager.sprint))//toggle sprint
         {
-            if (grounded && !isCrouching)
+            if (playerManager.grounded && !isCrouching)
             {
                 if(!isSprinting)//&& !isCrouching && grounded)//if is not running then run
                 {
@@ -242,23 +251,23 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         
         // on ground
-        if (grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        if (playerManager.grounded)
+            playerManager.rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
         // in air
         else
-            rb.AddForce(moveDirection.normalized * moveSpeed * airMultiplier * 10f, ForceMode.Force);
+            playerManager.rb.AddForce(moveDirection.normalized * moveSpeed * airMultiplier * 10f, ForceMode.Force);
               
     }
 
     //limit player speed to never go over what is set in moveSpeed
     private void speedControl()
     {
-        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        Vector3 flatVel = new Vector3(playerManager.rb.velocity.x, 0f, playerManager.rb.velocity.z);
         //limit  velocity if needed
         if(flatVel.magnitude>moveSpeed)
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+            playerManager.rb.velocity = new Vector3(limitedVel.x, playerManager.rb.velocity.y, limitedVel.z);
         }
     }
     #endregion

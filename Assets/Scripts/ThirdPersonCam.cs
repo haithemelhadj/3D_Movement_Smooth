@@ -5,6 +5,7 @@ using UnityEngine;
 public class ThirdPersonCam : MonoBehaviour
 {
     [Header("Refrences")]
+    public PlayerManager playerManager;
     public Transform orientation;
     public Transform player;
     public Transform playerObj;
@@ -34,7 +35,9 @@ public class ThirdPersonCam : MonoBehaviour
         //rotate orientation
         Vector3 viewDir = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         orientation.forward = viewDir.normalized;
-
+        //if player is hanging he can't rotate
+        if (playerManager.isHanging)
+            return;
         //rotate player object
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
